@@ -9,19 +9,15 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.opencsv.CSVWriter;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+
 @TeleOp
 public class colorSensorCVS extends LinearOpMode {
     private RevColorSensorV3 colorSensor;
 
-    private static final Logger log = LoggerFactory.getLogger(colorSensorCVS.class);
 
     private ElapsedTime loopTimer;
 
@@ -29,7 +25,6 @@ public class colorSensorCVS extends LinearOpMode {
     private FileWriter fileWriter;
     private CSVWriter csvWriter;
     private final ArrayList<String[]> dataArray = new ArrayList<String[]>();
-    private boolean addData;
 
     @Override
     public void runOpMode() {
@@ -38,11 +33,13 @@ public class colorSensorCVS extends LinearOpMode {
         loopTimer = new ElapsedTime();
 
         file = new File(String.format("%s/FIRST/colorSensorData.csv", Environment.getExternalStorageDirectory().getAbsolutePath()));
+
         try {
             fileWriter = new FileWriter(file);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
         csvWriter = new CSVWriter(fileWriter);
         dataArray.add(new String[]{"Red(red)", "Green(green)", "Blue(blue)", "Alpha(alpha)"});
         waitForStart();
@@ -65,11 +62,19 @@ public class colorSensorCVS extends LinearOpMode {
             String Blue = blue + "";
             String Alpha = alpha + "";
 
-            if (addData) {
-                dataArray.add(new String[]{Red, Green, Blue, Alpha});
-            }
-            }
-        }
+            dataArray.add(new String[]{Red, Green, Blue, Alpha});
 
+
+        }
+        try {
+            csvWriter.writeAll(dataArray);
+            csvWriter.close();
+        } catch (Exception e) {
+            telemetry.addData("-", e.getMessage());
+            telemetry.update();
+        }
     }
+
+}
+
 
