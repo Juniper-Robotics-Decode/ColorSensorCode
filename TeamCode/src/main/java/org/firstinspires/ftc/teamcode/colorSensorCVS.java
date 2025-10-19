@@ -2,12 +2,16 @@ package org.firstinspires.ftc.teamcode;
 
 import android.os.Environment;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import com.opencsv.CSVWriter;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -16,7 +20,7 @@ import java.util.ArrayList;
 
 @TeleOp
 public class colorSensorCVS extends LinearOpMode {
-    private RevColorSensorV3 colorSensor;
+    private RevColorSensorV3 colorSensor1;
 
 
     private ElapsedTime loopTimer;
@@ -25,14 +29,16 @@ public class colorSensorCVS extends LinearOpMode {
     private FileWriter fileWriter;
     private CSVWriter csvWriter;
     private final ArrayList<String[]> dataArray = new ArrayList<String[]>();
+    private boolean addData = true;
 
     @Override
     public void runOpMode() {
-        colorSensor = hardwareMap.get(RevColorSensorV3.class, "colorSensor");
+        colorSensor1 = hardwareMap.get(RevColorSensorV3.class, "colorSensor1");
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         loopTimer = new ElapsedTime();
 
-        file = new File(String.format("%s/FIRST/colorSensorData.csv", Environment.getExternalStorageDirectory().getAbsolutePath()));
+        file = new File(String.format("%s/FIRST/colorSensorData25.csv", Environment.getExternalStorageDirectory().getAbsolutePath()));
 
         try {
             fileWriter = new FileWriter(file);
@@ -41,38 +47,46 @@ public class colorSensorCVS extends LinearOpMode {
         }
 
         csvWriter = new CSVWriter(fileWriter);
-        dataArray.add(new String[]{"Red(red)", "Green(green)", "Blue(blue)", "Alpha(alpha)"});
+        dataArray.add(new String[]{"Red1(red1)", "Green1(green1)", "Blue1(blue1)", "Alpha1(alpha1)", "Distance1(distance1)"});
         waitForStart();
+        if (addData) {
+            for (int i = 0; i < 100; i++) {
+                loopTimer.reset();
+                int red1 = colorSensor1.red();
+                int blue1 = colorSensor1.blue();
+                int green1 = colorSensor1.green();
+                int alpha1 = colorSensor1.alpha();
+                double distance1 = colorSensor1.getDistance(DistanceUnit.MM);
 
-        for (int i = 0; i < 5000; i++) {
-            loopTimer.reset();
-            int red = colorSensor.red();
-            int blue = colorSensor.blue();
-            int green = colorSensor.green();
-            int alpha = colorSensor.alpha();
+                telemetry.addData("Red1:", red1);
+                telemetry.addData("Green1:", green1);
+                telemetry.addData("Blue1:", blue1);
+                telemetry.addData("Alpha1:", alpha1);
+                telemetry.addData("Distance1:", distance1);
+                telemetry.addData("i:", i);
+                telemetry.update();
 
-            telemetry.addData("Red:", red);
-            telemetry.addData("Green:", green);
-            telemetry.addData("Blue:", blue);
-            telemetry.addData("Alpha:", alpha);
-            telemetry.update();
+                String Red1 = red1 + "";
+                String Green1 = green1 + "";
+                String Blue1 = blue1 + "";
+                String Alpha1 = alpha1 + "";
+                String Distance1 = distance1 + "";
 
-            String Red = red + "";
-            String Green = green + "";
-            String Blue = blue + "";
-            String Alpha = alpha + "";
-
-            dataArray.add(new String[]{Red, Green, Blue, Alpha});
+                dataArray.add(new String[]{Red1, Green1, Blue1, Alpha1, Distance1});
 
 
+            }
         }
         try {
             csvWriter.writeAll(dataArray);
             csvWriter.close();
+            addData = false;
         } catch (Exception e) {
             telemetry.addData("-", e.getMessage());
-            telemetry.update();
         }
+        telemetry.addData("-", "DONE COLLECTING");
+        telemetry.update();
+
     }
 
 }
