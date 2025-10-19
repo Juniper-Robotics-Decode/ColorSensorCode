@@ -38,7 +38,7 @@ public class colorSensorCVS extends LinearOpMode {
 
         loopTimer = new ElapsedTime();
 
-        file = new File(String.format("%s/FIRST/Purple2.csv", Environment.getExternalStorageDirectory().getAbsolutePath()));
+        file = new File(String.format("%s/FIRST/Green3.csv", Environment.getExternalStorageDirectory().getAbsolutePath()));
 
         try {
             fileWriter = new FileWriter(file);
