@@ -38,7 +38,7 @@ public class colorSensorCVS extends LinearOpMode {
 
         loopTimer = new ElapsedTime();
 
-        file = new File(String.format("%s/FIRST/Green3.csv", Environment.getExternalStorageDirectory().getAbsolutePath()));
+        file = new File(String.format("%s/FIRST/Empty(1:P, 2:G, 3:P).csv", Environment.getExternalStorageDirectory().getAbsolutePath()));
 
         try {
             fileWriter = new FileWriter(file);
@@ -50,7 +50,7 @@ public class colorSensorCVS extends LinearOpMode {
         dataArray.add(new String[]{"Red1(red1)", "Green1(green1)", "Blue1(blue1)", "Alpha1(alpha1)", "Distance1(distance1)"});
         waitForStart();
         if (addData) {
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 1000; i++) {
                 loopTimer.reset();
                 int red1 = colorSensor1.red();
                 int blue1 = colorSensor1.blue();
