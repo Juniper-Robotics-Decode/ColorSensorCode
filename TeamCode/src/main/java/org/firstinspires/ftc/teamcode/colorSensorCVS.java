@@ -21,24 +21,53 @@ import java.util.ArrayList;
 @TeleOp
 public class colorSensorCVS extends LinearOpMode {
     private RevColorSensorV3 colorSensor1;
+    private RevColorSensorV3 colorSensor2;
+    private RevColorSensorV3 colorSensor3;
 
 
     private ElapsedTime loopTimer;
 
-    private File file;
-    private FileWriter fileWriter;
-    private CSVWriter csvWriter;
-    private final ArrayList<String[]> dataArray = new ArrayList<String[]>();
+    private File file1;
+    private File file2;
+    private File file3;
+    private FileWriter fileWriter1;
+    private FileWriter fileWriter2;
+    private FileWriter fileWriter3;
+    private CSVWriter csvWriter1;
+    private CSVWriter csvWriter2;
+    private CSVWriter csvWriter3;
     private boolean addData = true;
 
     @Override
     public void runOpMode() {
         colorSensor1 = hardwareMap.get(RevColorSensorV3.class, "colorSensor1");
+        colorSensor2 = hardwareMap.get(RevColorSensorV3.class, "colorSensor2");
+        colorSensor3 = hardwareMap.get(RevColorSensorV3.class, "colorSensor3");
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        loopTimer = new ElapsedTime();
+        file1 = new File(String.format("%s/FIRST/CS1.csv", Environment.getExternalStorageDirectory().getAbsolutePath()));
+        file2 = new File(String.format("%s/FIRST/CS2.csv", Environment.getExternalStorageDirectory().getAbsolutePath()));
+        file3 = new File(String.format("%s/FIRST/CS3.csv", Environment.getExternalStorageDirectory().getAbsolutePath()));
 
-        file = new File(String.format("%s/FIRST/Empty(1:P, 2:G, 3:P).csv", Environment.getExternalStorageDirectory().getAbsolutePath()));
+        waitForStart();
+
+        if (addData) {
+            colorSensorDataCollection(colorSensor1, file1);
+            colorSensorDataCollection(colorSensor2, file2);
+            colorSensorDataCollection(colorSensor3, file3);
+            addData = false;
+        }
+        else{
+            telemetry.addData("-", "DATA COLLECTING HAS FINISHED");
+            telemetry.update();
+        }
+
+
+    }
+    public void colorSensorDataCollection(RevColorSensorV3 cs, File file ) {
+        ArrayList<String[]> dataArray = new ArrayList<String[]>();
+        dataArray.add(new String[]{"Red", "Green", "Blue", "Alpha", "Distance"});
+        FileWriter fileWriter;
 
         try {
             fileWriter = new FileWriter(file);
@@ -46,46 +75,38 @@ public class colorSensorCVS extends LinearOpMode {
             throw new RuntimeException(e);
         }
 
-        csvWriter = new CSVWriter(fileWriter);
-        dataArray.add(new String[]{"Red1(red1)", "Green1(green1)", "Blue1(blue1)", "Alpha1(alpha1)", "Distance1(distance1)"});
-        waitForStart();
-        if (addData) {
-            for (int i = 0; i < 1000; i++) {
-                loopTimer.reset();
-                int red1 = colorSensor1.red();
-                int blue1 = colorSensor1.blue();
-                int green1 = colorSensor1.green();
-                int alpha1 = colorSensor1.alpha();
-                double distance1 = colorSensor1.getDistance(DistanceUnit.MM);
+       CSVWriter csvWriter = new CSVWriter(fileWriter);
+        for (int i = 0; i < 1000; i++) {
+            int red = cs.red();
+            int blue = cs.blue();
+            int green = cs.green();
+            int alpha = cs.alpha();
+            double distance = cs.getDistance(DistanceUnit.MM);
 
-                telemetry.addData("Red1:", red1);
-                telemetry.addData("Green1:", green1);
-                telemetry.addData("Blue1:", blue1);
-                telemetry.addData("Alpha1:", alpha1);
-                telemetry.addData("Distance1:", distance1);
-                telemetry.addData("i:", i);
-                telemetry.update();
+            telemetry.addData("Red:", red);
+            telemetry.addData("Green:", green);
+            telemetry.addData("Blue:", blue);
+            telemetry.addData("Alpha:", alpha);
+            telemetry.addData("Distance:", distance);
+            telemetry.addData("i:", i);
+            telemetry.update();
 
-                String Red1 = red1 + "";
-                String Green1 = green1 + "";
-                String Blue1 = blue1 + "";
-                String Alpha1 = alpha1 + "";
-                String Distance1 = distance1 + "";
+            String Red = red + "";
+            String Green = green + "";
+            String Blue = blue + "";
+            String Alpha = alpha + "";
+            String Distance = distance + "";
 
-                dataArray.add(new String[]{Red1, Green1, Blue1, Alpha1, Distance1});
-
-
-            }
+            dataArray.add(new String[]{Red, Green, Blue, Alpha, Distance});
         }
+
         try {
             csvWriter.writeAll(dataArray);
             csvWriter.close();
-            addData = false;
         } catch (Exception e) {
             telemetry.addData("-", e.getMessage());
+            telemetry.update();
         }
-        telemetry.addData("-", "DONE COLLECTING");
-        telemetry.update();
 
     }
 
