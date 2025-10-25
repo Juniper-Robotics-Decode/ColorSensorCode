@@ -8,17 +8,23 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
+import java.util.Arrays;
+
 @TeleOp
 public class CSLogic extends LinearOpMode {
     private RevColorSensorV3 colorSensor1;
     private RevColorSensorV3 colorSensor2;
     private RevColorSensorV3 colorSensor3;
-    private String[] =[", , Purple"];
     private String greenStr = "Green";
     private String purpleStr = "Purple";
     private String emptyStr = "Empty";
 
-    private String[] correctMotif = {purpleStr, purpleStr, greenStr};
+    private final String[] correctMotif = {purpleStr, purpleStr, greenStr};
+    private final String[] wrongMotif1 = {purpleStr, greenStr, greenStr};
+    private final String[] wrongMotif2 = {greenStr, greenStr, purpleStr};
+    private final String[] wrongMotif3 = {greenStr, purpleStr, greenStr};
+    private final String[] allGreenMotif = {greenStr, greenStr, greenStr};
+    private final String[] allPurpleMotif = {purpleStr, purpleStr, purpleStr};
     private String[] detectedMotif = new String[3];
 
     @Override
@@ -35,16 +41,36 @@ public class CSLogic extends LinearOpMode {
             detectedMotif[1] = colorDetector(colorSensor2);
             detectedMotif[2] = colorDetector(colorSensor3);
             if (detectedMotif == correctMotif) {
-                telemetry.addData("Slot 1:", "Correct");
+                telemetry.addData("State", "Correct Colors & Correct Order");
             }
-            if (detectedMotif != correctMotif) {
-                telemetry.addData("Slot 1:", "Incorrect");
-            }
-            if (detectedMotif != correctMotif) {
-                telemetry.addData("Slot 1:", "Correct");
-            }
+            if (detectedMotif[0].equals(greenStr) || detectedMotif[0].equals(purpleStr)) {
+                telemetry.addData("Slot 1:", "Full");
+                if (detectedMotif[1].equals(greenStr) || detectedMotif[1].equals(purpleStr)) {
+                    telemetry.addData("Slot 2:", "Full");
+                    if (detectedMotif[2].equals(greenStr) || detectedMotif[2].equals(purpleStr)) {
+                        telemetry.addData("State:", "Full");
+                        if ((detectedMotif == wrongMotif1)
+                                || (detectedMotif == wrongMotif2)
+                                || (detectedMotif == wrongMotif3)
+                                || (detectedMotif == allGreenMotif)
+                                || (detectedMotif == allPurpleMotif)) {
+                            telemetry.addData("State", "Wrong color");
+                        } else if (!Arrays.equals(detectedMotif, correctMotif)) {
+                            telemetry.addData("State", "Wrong Order");
+                        } else {
+                            telemetry.addData("State", "Correct Colors & Correct Order");
+                        }
 
+                    }
+                }
+            } else if ((detectedMotif[0].equals(greenStr) || detectedMotif[0].equals(purpleStr))
+                    || ((detectedMotif[1].equals(greenStr) || detectedMotif[1].equals(purpleStr))
+                    || ((detectedMotif[2].equals(greenStr) || detectedMotif[2].equals(purpleStr))))) {
+                telemetry.addData("State:", "Partially Full");
 
+            } else {
+                telemetry.addData("State", "Empty");
+            }
 
         }
     }
