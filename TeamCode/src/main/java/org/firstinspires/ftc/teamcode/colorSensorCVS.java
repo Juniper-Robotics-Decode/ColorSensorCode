@@ -45,9 +45,9 @@ public class colorSensorCVS extends LinearOpMode {
         colorSensor3 = hardwareMap.get(RevColorSensorV3.class, "colorSensor3");
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        file1 = new File(String.format("%s/FIRST/CS1.csv", Environment.getExternalStorageDirectory().getAbsolutePath()));
-        file2 = new File(String.format("%s/FIRST/CS2.csv", Environment.getExternalStorageDirectory().getAbsolutePath()));
-        file3 = new File(String.format("%s/FIRST/CS3.csv", Environment.getExternalStorageDirectory().getAbsolutePath()));
+        file1 = new File(String.format("%s/FIRST/GreenHole1.csv", Environment.getExternalStorageDirectory().getAbsolutePath()));
+        file2 = new File(String.format("%s/FIRST/GreenHole2.csv", Environment.getExternalStorageDirectory().getAbsolutePath()));
+        file3 = new File(String.format("%s/FIRST/GreenHole3.csv", Environment.getExternalStorageDirectory().getAbsolutePath()));
 
         waitForStart();
 
