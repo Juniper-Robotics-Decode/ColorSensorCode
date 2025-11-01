@@ -18,6 +18,7 @@ public class SpindexMotor extends LinearOpMode {
 
 
     @Override
+    //-----
     public void runOpMode() {
         SpindexMotor = hardwareMap.get(DcMotor.class, "SpindexMotor");
         tcs1 = hardwareMap.get(TouchSensor.class, "TCS1");

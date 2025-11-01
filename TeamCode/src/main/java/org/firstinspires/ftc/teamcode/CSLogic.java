@@ -29,7 +29,7 @@ public class CSLogic extends LinearOpMode {
     private boolean Purple0;
     private boolean Purple1;
     private boolean Purple2;
-
+//----
     private final String[] correctMotif = {purpleStr, purpleStr, greenStr};
     private final String[] wrong1 = {purpleStr, greenStr, greenStr};
     private final String[] wrong2 = {greenStr, greenStr, purpleStr};
