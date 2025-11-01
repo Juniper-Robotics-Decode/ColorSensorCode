@@ -9,9 +9,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import java.util.Arrays;
-// ALl detection works
-// Need to add for holes
-// Need to display what colors are in spindex and what is empty when partialy full
+
 @TeleOp
 public class CSLogic extends LinearOpMode {
     private RevColorSensorV3 colorSensor1;
@@ -33,8 +31,6 @@ public class CSLogic extends LinearOpMode {
     private boolean Purple2;
 
     private final String[] correctMotif = {purpleStr, purpleStr, greenStr};
-    private final String[] purple = {purpleStr, purpleStr, purpleStr};
-    private final String[] green = {greenStr, greenStr, greenStr};
     private final String[] wrong1 = {purpleStr, greenStr, greenStr};
     private final String[] wrong2 = {greenStr, greenStr, purpleStr};
     private final String[] wrong3 = {greenStr, purpleStr, greenStr};
@@ -56,7 +52,7 @@ public class CSLogic extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         waitForStart();
-
+//---
         while (opModeIsActive()) {
             detectedMotif[0] = colorDetector(colorSensor1);
             detectedMotif[1] = colorDetector(colorSensor2);
