@@ -12,34 +12,39 @@ public class SpindexMotor extends LinearOpMode {
 
     private DcMotor SpindexMotor;
     private TouchSensor tcs1;
-    //   private TouchSensor tcs2;
-    //   private TouchSensor tcs3;
+    private TouchSensor tcs2;
+    private TouchSensor tcs3;
     private final int i = 1;
 
 
     @Override
-    //-----
+
     public void runOpMode() {
         SpindexMotor = hardwareMap.get(DcMotor.class, "SpindexMotor");
         tcs1 = hardwareMap.get(TouchSensor.class, "TCS1");
-        // tcs2 = hardwareMap.get(TouchSensor.class, "TCS2");
-        //  tcs3 = hardwareMap.get(TouchSensor.class, "TCS3");
+        tcs2 = hardwareMap.get(TouchSensor.class, "TCS2");
+        tcs3 = hardwareMap.get(TouchSensor.class, "TCS3");
 
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         waitForStart();
 
+
         while (opModeIsActive()) {
 
-            if (tcs1.isPressed()) {
+            if (tcs1.isPressed() && tcs2.isPressed() && tcs3.isPressed()) {
                 SpindexMotor.setPower(0);
-                telemetry.addData("TCS1 Pressed", tcs1.isPressed());
-                telemetry.addData("Motor Power", SpindexMotor.getPower());
+                SpindexMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             } else {
-                SpindexMotor.setPower(0.5);
-                telemetry.addData("TCS1 Pressed", tcs1.isPressed());
-                telemetry.addData("Motor Power", SpindexMotor.getPower());
+                SpindexMotor.setPower(1);
+
+
             }
+            telemetry.addData("TCS1 Pressed", tcs1.isPressed());
+            telemetry.addData("TCS2 Pressed", tcs2.isPressed());
+            telemetry.addData("TCS3 Pressed", tcs3.isPressed());
+
+            telemetry.addData("Motor Power", SpindexMotor.getPower());
             telemetry.update();
 
         }
