@@ -4,14 +4,22 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import java.util.Arrays;
 
+// Square = Shoot purple
+// Circle = Shoot green
+// Triangle = Shoot any
+//Pocket one is our theoretical shooting pocket
+
 @TeleOp
 public class CSLogic extends LinearOpMode {
+    Gamepad gamepad = gamepad1;
+
     private RevColorSensorV3 colorSensor1;
     private RevColorSensorV3 colorSensor2;
     private RevColorSensorV3 colorSensor3;
@@ -23,25 +31,13 @@ public class CSLogic extends LinearOpMode {
     private boolean full1 = false;
     private boolean full2 = false;
 
-    private boolean Green0;
-    private boolean Green1;
-    private boolean Green2;
-    private boolean Purple0;
-    private boolean Purple1;
-    private boolean Purple2;
-
-    private int greenMotif;
-    private int greenCurrent;
-    private int purpleMotif;
-    private int purpleCurrent;
-    private int greenNeeded;
-    private int purpleNeeded;
-
-    private final String[] correctMotif = {purpleStr, purpleStr, greenStr};
+    private boolean Green0 = false;
+    private boolean Green1 = false;
+    private boolean Green2 = false;
+    private boolean Purple0 = false;
+    private boolean Purple1 = false;
+    private boolean Purple2 = false;
     private String[] detectedMotif = new String[3];
-    private boolean[] detectedGreen = new boolean[3];
-    private boolean[] detectedPurple = new boolean[3];
-
     private double d1;
     private double d2;
     private double d3;
@@ -54,14 +50,8 @@ public class CSLogic extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         waitForStart();
-//---
+
         while (opModeIsActive()) {
-
-            greenMotif = 0;
-            purpleMotif = 0;
-            greenCurrent = 0;
-            purpleCurrent = 0;
-
             detectedMotif[0] = colorDetector(colorSensor1);
             detectedMotif[1] = colorDetector(colorSensor2);
             detectedMotif[2] = colorDetector(colorSensor3);
@@ -71,82 +61,60 @@ public class CSLogic extends LinearOpMode {
             telemetry.addData("DistanceCS1", d1);
             telemetry.addData("DistanceCS2", d2);
             telemetry.addData("DistanceCS3", d3);
+            telemetry.addData("State", "");
+            telemetry.update();
 
             if (detectedMotif[0].equals(greenStr)) {
-                detectedGreen[0] = true;
-            }
-            if (detectedMotif[1].equals(greenStr)) {
-                detectedGreen[1] = true;
-            }
-            if (detectedMotif[2].equals(greenStr)) {
-                detectedGreen[2]= true;
-            }
-            if (detectedMotif[0].equals(purpleStr)) {
-                detectedPurple[0] = true;
-            }
-            if (detectedMotif[1].equals(purpleStr)) {
-                detectedGreen[1] = true;
-            }
-            if (detectedMotif[2].equals(purpleStr)) {
-                detectedGreen[2] = true;
-            }
-
-
-            if (detectedMotif[0].equals(greenStr) || detectedMotif[0].equals(purpleStr)) {
                 full0 = true;
-                telemetry.addData("Slot1", full0);
+                Green0 = true;
+                telemetry.addData("Slot1", "Green");
+            } else if (detectedMotif[0].equals(purpleStr)) {
+                full0 = true;
+                Purple0 = true;
+                telemetry.addData("Slot1", "Purple");
             } else {
                 full0 = false;
                 telemetry.addData("Slot1", full0);
-
             }
 
-            if (detectedMotif[1].equals(greenStr) || detectedMotif[1].equals(purpleStr)) {
+            if (detectedMotif[1].equals(greenStr)) {
                 full1 = true;
-                telemetry.addData("Slot2", full1);
-
+                Green1 = true;
+                telemetry.addData("Slot2", "Green");
+            } else if (detectedMotif[1].equals(purpleStr)) {
+                full1 = true;
+                Purple1 = true;
+                telemetry.addData("Slot2", "Purple");
             } else {
                 full1 = false;
                 telemetry.addData("Slot2", full1);
             }
 
-            if (detectedMotif[2].equals(greenStr) || detectedMotif[2].equals(purpleStr)) {
+            if (detectedMotif[2].equals(greenStr)) {
                 full2 = true;
-                telemetry.addData("Slot3", full2);
-
+                Green2 = true;
+                telemetry.addData("Slot3", "Green");
+            } else if (detectedMotif[2].equals(purpleStr)) {
+                full2 = true;
+                Purple2 = true;
+                telemetry.addData("Slot3", "Purple");
             } else {
                 full2 = false;
                 telemetry.addData("Slot3", full2);
             }
-            for (String s : correctMotif) {
-                if (s.equals(purpleStr)) {
-                    purpleMotif++;
-                } else if (s.equals(greenStr)) {
-                    greenMotif++;
-                }
-            }
-
-            for (boolean detectingG : detectedGreen) {
-                if (detectingG) {
-                    greenCurrent++;
-                }
-            }
-            for (boolean detectingP : detectedPurple) {
-                if (detectingP) {
-                    purpleCurrent++;
-                }
-            }
-            greenNeeded = greenMotif - greenCurrent;
-            purpleNeeded = purpleMotif - purpleCurrent;
 
             if (full0 && full1 && full2) {
                 telemetry.addData("State", "Full");
-                if (purpleCurrent == purpleMotif && greenCurrent == greenMotif) {
-                    telemetry.addData("State", "Correct Color + Order");
+                if ((Green0 && Green1 && Green2)
+                        || (Purple0 && Purple1 && Purple2)
+                        || (Green0 && Green1 && Purple2)
+                        || (Green0 && Purple0 && Green2)
+                        || (Purple0 && Green1 && Green2)) {
+                    telemetry.addData("State", "Full & Wrong Color");
+                } else if ((Green0 && Purple1 && Purple2) || (Purple0 && Green1 && Purple2)) {
+                    telemetry.addData("State", "Full & Wrong Order");
                 } else {
-                    telemetry.addData("State", "Full +  Wrong Color");
-                    telemetry.addData("Purple Needed", purpleNeeded);
-                    telemetry.addData("Green Needed", greenNeeded);
+                    telemetry.addData("State", "Correct Color + Order");
                 }
             } else if (!full0 && !full1 && !full2) {
                 telemetry.addData("State", "Empty");
@@ -154,18 +122,21 @@ public class CSLogic extends LinearOpMode {
                 telemetry.addData("State", "Partially Full");
             }
 
+            if (gamepad1.square && (!Purple0 || !full0) ) {
+                gamepad1.rumble(500);
+            }
 
-
-            telemetry.addData("# of Greens in Motif", greenMotif);
-            telemetry.addData("# of Purples in Motif", purpleMotif);
-            telemetry.addData("Purples in Spindex", purpleCurrent);
-            telemetry.addData("Greens in Spindex", greenCurrent);
-
+            if (gamepad1.circle && (!Green0 || !full0) ) {
+                gamepad1.rumble(500);
+            }
+            if (gamepad1.triangle && !full0) {
+                gamepad1.rumble(500);
+            }
 
             telemetry.update();
+
         }
     }
-
 
     public String colorDetector(RevColorSensorV3 cs) {
         int blue = cs.blue();
