@@ -15,7 +15,7 @@ import java.util.Arrays;
 // Circle = Shoot green
 // Triangle = Shoot any
 //Pocket one is our theoretical shooting pocket
-
+//yep lad
 @TeleOp
 public class CSLogic extends LinearOpMode {
     Gamepad gamepad = gamepad1;
