@@ -9,8 +9,12 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
+// Square = Shoot purple
+// Circle = Shoot green
+// Triangle = Shoot any
+
 @TeleOp
-public class CSLogic extends LinearOpMode {
+public class controllerHapticTesting extends LinearOpMode {
     Gamepad gamepad = gamepad1;
 
     private RevColorSensorV3 colorSensor1;
@@ -55,6 +59,7 @@ public class CSLogic extends LinearOpMode {
             telemetry.addData("DistanceCS2", d2);
             telemetry.addData("DistanceCS3", d3);
             telemetry.addData("State", "");
+            telemetry.update();
 
             if (detectedMotif[0].equals(greenStr)) {
                 full0 = true;
@@ -95,6 +100,20 @@ public class CSLogic extends LinearOpMode {
                 telemetry.addData("Slot3", full2);
             }
 
+            if (gamepad1.square && (!Purple0)) {
+                gamepad1.rumble(500);
+            }
+
+            if (gamepad1.circle && (!Green0)) {
+                gamepad1.rumble(500);
+            }
+            if (gamepad1.triangle && !full0) {
+                gamepad1.rumble(500);
+            }
+
+
+
+
             if (full0 && full1 && full2) {
                 telemetry.addData("State", "Full");
                 if ((Green0 && Green1 && Green2)
@@ -113,19 +132,8 @@ public class CSLogic extends LinearOpMode {
             } else {
                 telemetry.addData("State", "Partially Full");
             }
-
-            if (gamepad1.square && (!Purple0 && !Purple1 && !Purple2)) {
-                gamepad1.rumble(500);
-            }
-
-            if (gamepad1.circle && (!Green0 && !Green1 && !Green2)) {
-                gamepad1.rumble(500);
-            }
-
-            if (gamepad1.triangle && (!full0 && !full1 && !full2)) {
-                gamepad1.rumble(500);
-            }
             telemetry.update();
+
         }
     }
 
@@ -148,7 +156,3 @@ public class CSLogic extends LinearOpMode {
         return "";
     }
 }
-// Square = Shoot purple
-// Circle = Shoot green
-
-// Triangle = Shoot any
