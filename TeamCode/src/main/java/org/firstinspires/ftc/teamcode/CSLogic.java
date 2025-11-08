@@ -59,40 +59,52 @@ public class CSLogic extends LinearOpMode {
             if (detectedMotif[0].equals(greenStr)) {
                 full0 = true;
                 Green0 = true;
+                Purple0 = false;
                 telemetry.addData("Slot1", "Green");
             } else if (detectedMotif[0].equals(purpleStr)) {
                 full0 = true;
                 Purple0 = true;
+                Green0 = false;
                 telemetry.addData("Slot1", "Purple");
             } else {
                 full0 = false;
-                telemetry.addData("Slot1", full0);
+                Green0 = false;
+                Purple0 = false;
+                telemetry.addData("Slot1", "Empty");
             }
 
             if (detectedMotif[1].equals(greenStr)) {
                 full1 = true;
                 Green1 = true;
+                Purple1 = false;
                 telemetry.addData("Slot2", "Green");
             } else if (detectedMotif[1].equals(purpleStr)) {
                 full1 = true;
                 Purple1 = true;
+                Green1 = false;
                 telemetry.addData("Slot2", "Purple");
             } else {
                 full1 = false;
-                telemetry.addData("Slot2", full1);
+                Green1 = false;
+                Purple1 = false;
+                telemetry.addData("Slot2", "Empty");
             }
 
             if (detectedMotif[2].equals(greenStr)) {
                 full2 = true;
                 Green2 = true;
+                Purple2 = false;
                 telemetry.addData("Slot3", "Green");
             } else if (detectedMotif[2].equals(purpleStr)) {
                 full2 = true;
                 Purple2 = true;
+                Green2 = false;
                 telemetry.addData("Slot3", "Purple");
             } else {
                 full2 = false;
-                telemetry.addData("Slot3", full2);
+                Green2 = false;
+                Purple2 = false;
+                telemetry.addData("Slot3", "Empty");
             }
 
             if (full0 && full1 && full2) {
@@ -117,7 +129,6 @@ public class CSLogic extends LinearOpMode {
             if (gamepad1.square && (!Purple0 && !Purple1 && !Purple2)) {
                 gamepad1.rumble(500);
             }
-
             if (gamepad1.circle && (!Green0 && !Green1 && !Green2)) {
                 gamepad1.rumble(500);
             }
@@ -125,6 +136,14 @@ public class CSLogic extends LinearOpMode {
             if (gamepad1.triangle && (!full0 && !full1 && !full2)) {
                 gamepad1.rumble(500);
             }
+
+            telemetry.addData("Purple0", Purple0);
+            telemetry.addData("Purple1", Purple1);
+            telemetry.addData("Purple2", Purple2);
+            telemetry.addData("Green0", Green0);
+            telemetry.addData("Green1", Green1);
+            telemetry.addData("Green2", Green2);
+
             telemetry.update();
         }
     }
@@ -150,5 +169,5 @@ public class CSLogic extends LinearOpMode {
 }
 // Square = Shoot purple
 // Circle = Shoot green
-
 // Triangle = Shoot any
+
