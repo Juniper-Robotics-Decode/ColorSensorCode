@@ -1,52 +1,169 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
+import com.qualcomm.hardware.rev.RevTouchSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Gamepad;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @TeleOp
 public class SpindexMotor extends LinearOpMode {
+    Gamepad gamepad = gamepad1;
+    private DcMotor spindexMotor;
+    private RevColorSensorV3 colorSensor1;
+    private RevColorSensorV3 colorSensor2;
+    private RevColorSensorV3 colorSensor3;
+    private RevTouchSensor TCS1;
+    private RevTouchSensor TCS2;
+    private RevTouchSensor TCS3;
 
-    private DcMotor SpindexMotor;
-    private TouchSensor tcs1;
-    private TouchSensor tcs2;
-    private TouchSensor tcs3;
-    private final int i = 1;
+    private final String greenStr = "Green";
+    private final String purpleStr = "Purple";
+    private final String emptyStr = "Empty";
 
+    private boolean[] full = new boolean[3];
+    private boolean[] green = new boolean[3];
+    private boolean[] purple = new boolean[3];
+    private String[] detectedMotif = new String[3];
+    private double d1;
+    private double d2;
+    private double d3;
 
     @Override
-
     public void runOpMode() {
-        SpindexMotor = hardwareMap.get(DcMotor.class, "SpindexMotor");
-        tcs1 = hardwareMap.get(TouchSensor.class, "TCS1");
-        tcs2 = hardwareMap.get(TouchSensor.class, "TCS2");
-        tcs3 = hardwareMap.get(TouchSensor.class, "TCS3");
-
+        colorSensor1 = hardwareMap.get(RevColorSensorV3.class, "colorSensor1");
+        colorSensor2 = hardwareMap.get(RevColorSensorV3.class, "colorSensor2");
+        colorSensor3 = hardwareMap.get(RevColorSensorV3.class, "colorSensor3");
+        TCS1 = hardwareMap.get(RevTouchSensor.class, "TCS1");
+        TCS2 = hardwareMap.get(RevTouchSensor.class, "TCS2");
+        TCS3 = hardwareMap.get(RevTouchSensor.class, "TCS3");
+        spindexMotor = hardwareMap.get(DcMotor.class, "spindexMotor");
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         waitForStart();
 
-
         while (opModeIsActive()) {
+            detectedMotif[0] = colorDetector(colorSensor1);
+            detectedMotif[1] = colorDetector(colorSensor2);
+            detectedMotif[2] = colorDetector(colorSensor3);
+            d1 = colorSensor1.getDistance(DistanceUnit.MM);
+            d2 = colorSensor2.getDistance(DistanceUnit.MM);
+            d3 = colorSensor3.getDistance(DistanceUnit.MM);
+            telemetry.addData("DistanceCS1", d1);
+            telemetry.addData("DistanceCS2", d2);
+            telemetry.addData("DistanceCS3", d3);
+            telemetry.addData("State", "");
 
-            if (tcs1.isPressed() && tcs2.isPressed() && tcs3.isPressed()) {
-                SpindexMotor.setPower(0);
-                SpindexMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            } else {
-                SpindexMotor.setPower(1);
 
-
+            for (int i = 0; i < detectedMotif.length; i++) {
+                if (detectedMotif[i].equals(greenStr)) {
+                    full[i] = true;
+                    green[i] = true;
+                    purple[i] = false;
+                    telemetry.addData("Slot" + i, "Green");
+                } else if (detectedMotif[i].equals(purpleStr)) {
+                    full[i] = true;
+                    purple[i] = true;
+                    green[i] = false;
+                    telemetry.addData("Slot1" + i, "Purple");
+                } else {
+                    full[i] = false;
+                    green[i] = false;
+                    purple[i] = false;
+                    telemetry.addData("Slot1" + i, "Empty");
+                }
             }
-            telemetry.addData("TCS1 Pressed", tcs1.isPressed());
-            telemetry.addData("TCS2 Pressed", tcs2.isPressed());
-            telemetry.addData("TCS3 Pressed", tcs3.isPressed());
 
-            telemetry.addData("Motor Power", SpindexMotor.getPower());
+            if (gamepad1.square && (!purple[0] && !purple[1] && !purple[2])) {
+                gamepad1.rumble(500);
+            }
+            if (gamepad1.circle && (!green[0] && !green[1] && !green[2])) {
+                gamepad1.rumble(500);
+            }
+            if (gamepad1.triangle && (full[0] || full[1] || full[2])) {
+                spindexMotor.setPower(0.3);
+                if ((full[0] && !gamepad.triangle)) {
+                    if (TCS1.isPressed()) {
+                        spindexMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                        spindexMotor.setPower(0);
+                        telemetry.addData("Pocket 1 is", "Full and under SHOOTER");
+                    } else if (!full[0] && !full[1] && !full[2]) {
+                        gamepad1.rumble(500);
+                }
+                if ((full[1] && !gamepad.triangle)) {
+                    if (TCS2.isPressed()) {
+                        spindexMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                        spindexMotor.setPower(0);
+                        telemetry.addData("Pocket 2 is", "Full and under SHOOTER");
+                    } else if (!full[0] && !full[1] && !full[2]) {
+                        gamepad1.rumble(500);
+                    }
+                }
+                if ((full[2] && !gamepad.triangle)) {
+                    if (TCS3.isPressed()) {
+                        spindexMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                        spindexMotor.setPower(0);
+                        telemetry.addData("Pocket 3 is", "Full and under SHOOTER");
+                    } else if (!full[0] && !full[1] && !full[2]) {
+                        gamepad1.rumble(500);
+                    }
+                }
+                if (TCS1.isPressed() || TCS2.isPressed() || TCS3.isPressed()){
+                    spindexMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                    spindexMotor.setPower(0);
+                }
+                }
+            }
+
+
+            telemetry.addData("purple[0]", purple[0]);
+            telemetry.addData("purple[1]", purple[1]);
+            telemetry.addData("purple[2]", purple[2]);
+            telemetry.addData("green[0]", green[0]);
+            telemetry.addData("green[1]", green[1]);
+            telemetry.addData("green[2]", green[2]);
+            telemetry.addData("TCS1", TCS1.isPressed());
+            telemetry.addData("TCS2", TCS2.isPressed());
+            telemetry.addData("TCS3", TCS3.isPressed());
+
             telemetry.update();
-
         }
+
     }
+
+
+    public String colorDetector(RevColorSensorV3 cs) {
+        int blue = cs.blue();
+        int green = cs.green();
+        int red = cs.red();
+        double dREAD = cs.getDistance(DistanceUnit.MM);
+
+        if (dREAD <= 20) {
+            if (green > red && green > blue) {
+                return greenStr;
+
+            } else if (blue > red && blue > green) {
+                return purpleStr;
+            }
+        } else {
+            return emptyStr;
+        }
+        return "";
+    }
+
+// Square = Shoot purple
+// Circle = Shoot green
+// Triangle = Shoot any
+//TCS = TouchSensor
+//TCS 1 = pocket1
+//TCS 2 = pocket
+//TCS 3 = pocket3
+
+
 }
+
