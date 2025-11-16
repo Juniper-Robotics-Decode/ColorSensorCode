@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 //e
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.hardware.rev.RevTouchSensor;
@@ -13,7 +14,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @TeleOp
 public class SpindexMotor extends LinearOpMode {
-    Gamepad gamepad = gamepad1;
     private DcMotor spindexMotor;
     private RevColorSensorV3 colorSensor1;
     private RevColorSensorV3 colorSensor2;
@@ -54,11 +54,8 @@ public class SpindexMotor extends LinearOpMode {
             d1 = colorSensor1.getDistance(DistanceUnit.MM);
             d2 = colorSensor2.getDistance(DistanceUnit.MM);
             d3 = colorSensor3.getDistance(DistanceUnit.MM);
-            telemetry.addData("DistanceCS1", d1);
-            telemetry.addData("DistanceCS2", d2);
-            telemetry.addData("DistanceCS3", d3);
-            telemetry.addData("State", "");
-
+            //telemetry.addData("DistanceCS1", d1);
+            //telemetry.addData("DistanceCS2", d2);
 
             for (int i = 0; i < detectedMotif.length; i++) {
                 if (detectedMotif[i].equals(greenStr)) {
@@ -70,54 +67,52 @@ public class SpindexMotor extends LinearOpMode {
                     full[i] = true;
                     purple[i] = true;
                     green[i] = false;
-                    telemetry.addData("Slot1" + i, "Purple");
+                    telemetry.addData("Slot" + i, "Purple");
                 } else {
                     full[i] = false;
                     green[i] = false;
                     purple[i] = false;
-                    telemetry.addData("Slot1" + i, "Empty");
+                    telemetry.addData("Slot" + i, "Empty");
                 }
             }
 
-            if (gamepad1.square && (!purple[0] && !purple[1] && !purple[2])) {
-                gamepad1.rumble(500);
+            if (gamepad1.square) {
+                boolean hasPurple = purple[0] || purple[1] || purple[2];
+                if (!hasPurple) {
+                    gamepad1.rumble(500);
+                }
             }
-            if (gamepad1.circle && (!green[0] && !green[1] && !green[2])) {
-                gamepad1.rumble(500);
+
+            if (gamepad1.circle) {
+                boolean hasGreen = green[0] || green[1] || green[2];
+                if (!hasGreen) {
+                    gamepad1.rumble(500);
+                }
             }
-            if (gamepad1.triangle && (full[0] || full[1] || full[2])) {
-                spindexMotor.setPower(0.3);
-                if ((full[0] && !gamepad.triangle)) {
-                    if (TCS1.isPressed()) {
-                        spindexMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                        spindexMotor.setPower(0);
-                        telemetry.addData("Pocket 1 is", "Full and under SHOOTER");
-                    } else if (!full[0] && !full[1] && !full[2]) {
-                        gamepad1.rumble(500);
+            if (gamepad1.triangle) {
+                if (!full[0] && !full[1] && !full[2]) {
+                    gamepad1.rumble(500);
+                } else {
+                    spindexMotor.setPower(0.3);
                 }
-                if ((full[1] && !gamepad.triangle)) {
-                    if (TCS2.isPressed()) {
-                        spindexMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                        spindexMotor.setPower(0);
-                        telemetry.addData("Pocket 2 is", "Full and under SHOOTER");
-                    } else if (!full[0] && !full[1] && !full[2]) {
-                        gamepad1.rumble(500);
-                    }
-                }
-                if ((full[2] && !gamepad.triangle)) {
-                    if (TCS3.isPressed()) {
-                        spindexMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                        spindexMotor.setPower(0);
-                        telemetry.addData("Pocket 3 is", "Full and under SHOOTER");
-                    } else if (!full[0] && !full[1] && !full[2]) {
-                        gamepad1.rumble(500);
-                    }
-                }
-                if (TCS1.isPressed() || TCS2.isPressed() || TCS3.isPressed()){
-                    spindexMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                    spindexMotor.setPower(0);
-                }
-                }
+            }
+
+            if (full[0] && TCS1.isPressed()) {
+                spindexMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                spindexMotor.setPower(0);
+                telemetry.addData("Pocket 1 is", "Full and under SHOOTER");
+            }
+
+            if (full[1] && TCS2.isPressed()) {
+                spindexMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                spindexMotor.setPower(0);
+                telemetry.addData("Pocket 2 is", "Full and under SHOOTER");
+            }
+
+            if (full[2] && TCS3.isPressed()) {
+                spindexMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                spindexMotor.setPower(0);
+                telemetry.addData("Pocket 3 is", "Full and under SHOOTER");
             }
 
 
@@ -133,9 +128,7 @@ public class SpindexMotor extends LinearOpMode {
 
             telemetry.update();
         }
-
     }
-
 
     public String colorDetector(RevColorSensorV3 cs) {
         int blue = cs.blue();
@@ -163,7 +156,5 @@ public class SpindexMotor extends LinearOpMode {
 //TCS 1 = pocket1
 //TCS 2 = pocket
 //TCS 3 = pocket3
-
-
 }
 
