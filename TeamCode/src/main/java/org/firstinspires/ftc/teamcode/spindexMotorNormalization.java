@@ -1,5 +1,5 @@
 package org.firstinspires.ftc.teamcode;
-//ee
+
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
@@ -28,8 +28,8 @@ public class spindexMotorNormalization extends LinearOpMode {
     private boolean[] full = new boolean[3];
     private boolean[] green = new boolean[3];
     private boolean[] purple = new boolean[3];
-    private String[] detectedMotif = new String[3];
-    private boolean[] tcs = new boolean[3];
+    private String[] detectedMotif = new String[3];//color detection usage
+    private boolean[] tcs = new boolean[3];//normalization usage
     private double d1;
     private double d2;
     private double d3;
@@ -55,7 +55,7 @@ public class spindexMotorNormalization extends LinearOpMode {
             spindexMotor.setPower(-0.16);
         }
         spindexMotor.setPower(0);
-
+//default motor spin
         waitForStart();
 
         while (opModeIsActive()) {
@@ -67,8 +67,6 @@ public class spindexMotorNormalization extends LinearOpMode {
             d1 = colorSensor1.getDistance(DistanceUnit.MM);
             d2 = colorSensor2.getDistance(DistanceUnit.MM);
             d3 = colorSensor3.getDistance(DistanceUnit.MM);
-            //telemetry.addData("DistanceCS1", d1);
-            //telemetry.addData("DistanceCS2", d2);
 
             for (int i = 0; i < detectedMotif.length; i++) {
                 if (detectedMotif[i].equals(greenStr)) {
@@ -167,6 +165,10 @@ public class spindexMotorNormalization extends LinearOpMode {
             telemetry.addData("TCS1", TCS1.isPressed());
             telemetry.addData("TCS2", TCS2.isPressed());
             telemetry.addData("TCS3", TCS3.isPressed());
+            telemetry.addData("DistanceCS1", d1);
+            telemetry.addData("DistanceCS2", d2);
+            telemetry.addData("DistanceCS3", d3);
+
 
             telemetry.update();
         }
@@ -177,7 +179,7 @@ public class spindexMotorNormalization extends LinearOpMode {
             int red = cs.red();
             double dREAD = cs.getDistance(DistanceUnit.MM);
 
-            if (dREAD <= 20) {
+            if (dREAD <= 60) {
                 if (green > red && green > blue) {
                     return greenStr;
 

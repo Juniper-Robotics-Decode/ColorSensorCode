@@ -5,6 +5,7 @@ import android.os.Environment;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -27,6 +28,8 @@ public class colorSensorCVS extends LinearOpMode {
 
     private ElapsedTime loopTimer;
 
+    private DcMotor spindexMotor;
+
     private File file1;
     private File file2;
     private File file3;
@@ -40,21 +43,22 @@ public class colorSensorCVS extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+        spindexMotor = hardwareMap.get(DcMotor.class, "spindexMotor");
         colorSensor1 = hardwareMap.get(RevColorSensorV3.class, "colorSensor1");
         colorSensor2 = hardwareMap.get(RevColorSensorV3.class, "colorSensor2");
         colorSensor3 = hardwareMap.get(RevColorSensorV3.class, "colorSensor3");
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        file1 = new File(String.format("%s/FIRST/Purple1.csv", Environment.getExternalStorageDirectory().getAbsolutePath()));
-        file2 = new File(String.format("%s/FIRST/RandomizeTestingData(Solid)2-Run3.csv", Environment.getExternalStorageDirectory().getAbsolutePath()));
-        file3 = new File(String.format("%s/FIRST/RandomizeTestingData(Solid)3-Run3.csv", Environment.getExternalStorageDirectory().getAbsolutePath()));
+        file1 = new File(String.format("%s/FIRST/SlipRingNoiseTest1.csv", Environment.getExternalStorageDirectory().getAbsolutePath()));
+        file2 = new File(String.format("%s/FIRST/SlipRingNoiseTest2.csv", Environment.getExternalStorageDirectory().getAbsolutePath()));
+        file3 = new File(String.format("%s/FIRST/SlipRingNoiseTest3.csv", Environment.getExternalStorageDirectory().getAbsolutePath()));
 
         waitForStart();
-
+        spindexMotor.setPower(0.16);
         if (addData) {
             colorSensorDataCollection(colorSensor1, file1);
-            colorSensorDataCollection(colorSensor2, file2);
-            colorSensorDataCollection(colorSensor3, file3);
+           colorSensorDataCollection(colorSensor2, file2);
+           colorSensorDataCollection(colorSensor3, file3);
             addData = false;
         }
         else{
@@ -68,7 +72,6 @@ public class colorSensorCVS extends LinearOpMode {
         ArrayList<String[]> dataArray = new ArrayList<String[]>();
         dataArray.add(new String[]{"Red", "Green", "Blue", "Alpha", "Distance"});
         FileWriter fileWriter;
-
         try {
             fileWriter = new FileWriter(file);
         } catch (IOException e) {
@@ -77,6 +80,7 @@ public class colorSensorCVS extends LinearOpMode {
 
        CSVWriter csvWriter = new CSVWriter(fileWriter);
         for (int i = 0; i < 1000; i++) {
+            spindexMotor.setPower(0.16);
             int red = cs.red();
             int blue = cs.blue();
             int green = cs.green();

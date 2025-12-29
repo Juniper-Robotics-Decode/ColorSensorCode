@@ -1,5 +1,5 @@
 package org.firstinspires.ftc.teamcode;
-//e
+
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
@@ -140,7 +140,7 @@ public class SpindexMotor extends LinearOpMode {
         int red = cs.red();
         double dREAD = cs.getDistance(DistanceUnit.MM);
 
-        if (dREAD <= 20) {
+        if (dREAD <= 60) {
             if (green > red && green > blue) {
                 return greenStr;
 

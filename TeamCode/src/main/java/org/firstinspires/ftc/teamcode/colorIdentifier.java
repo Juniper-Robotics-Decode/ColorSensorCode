@@ -39,29 +39,33 @@ public class colorIdentifier extends LinearOpMode {
             int green3 = colorSensor3.green();
             double distance3 = colorSensor3.getDistance(DistanceUnit.MM);
 
-            if (distance1 > 10) {
-                telemetry.addData("Slot1: ", "Empty");
+            if (distance1 > 60) {
+                telemetry.addData("Slot1(cs1): ", "Empty");
             } else if (green1 > red1 && green1 > blue1) {
-                telemetry.addData("Slot1: ", "Green");
+                telemetry.addData("Slot1(cs1): ", "Green");
             } else if (blue1 > red1 && blue1 > green1) {
-                telemetry.addData("Slot1: ", "Purple");
+                telemetry.addData("Slot1(cs1): ", "Purple");
             }
 
-            if (distance2 > 10) {
-                telemetry.addData("Slot2: ", "Empty");
+            if (distance2 > 60) {
+                telemetry.addData("Slot2(cs2): ", "Empty");
             } else if (green2 > red2 && green2 > blue2) {
-                telemetry.addData("Slot2: ", "Green");
+                telemetry.addData("Slot2(cs2): ", "Green");
             } else if (blue2 > red2 && blue2 > green2) {
-                telemetry.addData("Slot2: ", "Purple");
+                telemetry.addData("Slot2(cs2): ", "Purple");
             }
 
-            if (distance3 > 10) {
-                telemetry.addData("Slot3: ", "Empty");
+            if (distance3 > 60) {
+                telemetry.addData("Slot3(cs3): ", "Empty");
             } else if (green3 > red3 && green3 > blue3) {
-                telemetry.addData("Slot3: ", "Green");
+                telemetry.addData("Slot3(cs3): ", "Green");
             } else if (blue3 > red3 && blue3 > green3) {
-                telemetry.addData("Slot3: ", "Purple");
+                telemetry.addData("Slot3(cs3): ", "Purple");
             }
+
+            telemetry.addData("distance1", distance1);
+            telemetry.addData("distance2", distance2);
+            telemetry.addData("distance3", distance3);
             telemetry.update();
         }
     }
