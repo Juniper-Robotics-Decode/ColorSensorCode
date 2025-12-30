@@ -6,6 +6,8 @@ import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.qualcomm.robotcore.hardware.DcMotor;
+
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 
@@ -39,7 +41,7 @@ public class colorIdentifier extends LinearOpMode {
             int green3 = colorSensor3.green();
             double distance3 = colorSensor3.getDistance(DistanceUnit.MM);
 
-            if (distance1 > 60) {
+            if (distance1 > 85) {
                 telemetry.addData("Slot1(cs1): ", "Empty");
             } else if (green1 > red1 && green1 > blue1) {
                 telemetry.addData("Slot1(cs1): ", "Green");
@@ -47,7 +49,7 @@ public class colorIdentifier extends LinearOpMode {
                 telemetry.addData("Slot1(cs1): ", "Purple");
             }
 
-            if (distance2 > 60) {
+            if (distance2 > 85) {
                 telemetry.addData("Slot2(cs2): ", "Empty");
             } else if (green2 > red2 && green2 > blue2) {
                 telemetry.addData("Slot2(cs2): ", "Green");
@@ -55,7 +57,7 @@ public class colorIdentifier extends LinearOpMode {
                 telemetry.addData("Slot2(cs2): ", "Purple");
             }
 
-            if (distance3 > 60) {
+            if (distance3 > 85) {
                 telemetry.addData("Slot3(cs3): ", "Empty");
             } else if (green3 > red3 && green3 > blue3) {
                 telemetry.addData("Slot3(cs3): ", "Green");
@@ -70,3 +72,53 @@ public class colorIdentifier extends LinearOpMode {
         }
     }
 }
+/*
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+
+@TeleOp
+public class Encoder_Test extends LinearOpMode {
+
+    public DcMotor EncoderTest;
+
+    @Override
+    public void runOpMode() {
+        EncoderTest = hardwareMap.get(DcMotor.class, "EM");
+
+        int target = 538;
+        int currentPos = EncoderTest.getCurrentPosition();
+
+        EncoderTest.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        EncoderTest.setTargetPosition(target);
+
+        telemetry.addData("Status", "Init & Ready");
+        telemetry.update();
+
+        waitForStart();
+
+        while (opModeIsActive()) {
+            EncoderTest.getCurrentPosition();
+            EncoderTest.setDirection(DcMotor.Direction.REVERSE);
+            EncoderTest.setPower(0.25);
+            if(currentPos != target) {
+                EncoderTest.setDirection(DcMotor.Direction.REVERSE);
+                EncoderTest.setPower(0.25);
+                telemetry.addData("Target:", target);
+                telemetry.addData("Power", EncoderTest.getPower());
+                telemetry.addData("Current Position:", EncoderTest.getCurrentPosition());
+                telemetry.update();
+            } else {
+                EncoderTest.setPower(0);
+                EncoderTest.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                telemetry.addData("Status", "Rotation Complete");
+                telemetry.update();
+            }
+        }
+
+
+    }
+}
+*/
