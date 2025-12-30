@@ -2,24 +2,24 @@ package org.firstinspires.ftc.teamcode;
 
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.hardware.rev.RevTouchSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @TeleOp
-public class spindexMotorNormalization extends LinearOpMode {
+public class spindexMotorNormalizationEncoder extends LinearOpMode {
     private DcMotor spindexMotor;
     private RevColorSensorV3 colorSensor1;
     private RevColorSensorV3 colorSensor2;
     private RevColorSensorV3 colorSensor3;
-    private RevTouchSensor TCS1;
-    private RevTouchSensor TCS2;
-    private RevTouchSensor TCS3;
+    private RevTouchSensor ShootingTCS;
+    private RevTouchSensor IntakingTCS;
+
 
     private final String greenStr = "Green";
     private final String purpleStr = "Purple";
@@ -38,20 +38,21 @@ public class spindexMotorNormalization extends LinearOpMode {
     int ball;
     int noBall;
     int pressedIndex;
-    double motorPower;
+    int z;
+    int pocketRotation = 179;
+    int intakingRotation = 179;
 
     @Override
     public void runOpMode() {
         colorSensor1 = hardwareMap.get(RevColorSensorV3.class, "colorSensor1");
         colorSensor2 = hardwareMap.get(RevColorSensorV3.class, "colorSensor2");
         colorSensor3 = hardwareMap.get(RevColorSensorV3.class, "colorSensor3");
-        TCS1 = hardwareMap.get(RevTouchSensor.class, "TCS1");
-        TCS2 = hardwareMap.get(RevTouchSensor.class, "TCS2");
-        TCS3 = hardwareMap.get(RevTouchSensor.class, "TCS3");
+        ShootingTCS = hardwareMap.get(RevTouchSensor.class, "ShootingTCS");
+        IntakingTCS = hardwareMap.get(RevTouchSensor.class, "IntakingTCS");
         spindexMotor = hardwareMap.get(DcMotor.class, "spindexMotor");
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        while(!TCS1.isPressed()){
+        while(!ShootingTCS.isPressed()){
             spindexMotor.setPower(-0.16);
         }
         spindexMotor.setPower(0);
@@ -92,7 +93,9 @@ public class spindexMotorNormalization extends LinearOpMode {
                 if (!hasPurple) {
                     gamepad1.rumble(500);
                 } else {
-                    spindexMotor.setPower(motorPower);
+                    spindexShootingReset();
+                    spindexMotor.setPower(1);
+                    spindexMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 }
             }
             if (gamepad1.circle) {
@@ -100,35 +103,27 @@ public class spindexMotorNormalization extends LinearOpMode {
                 if (!hasGreen) {
                     gamepad1.rumble(500);
                 } else {
-                    spindexMotor.setPower(motorPower);
+                    spindexShootingReset();
+                    spindexMotor.setPower(1);
+                    spindexMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 }
             }
             if (gamepad1.triangle) {
                 if (!full[0] && !full[1] && !full[2]) {
                     gamepad1.rumble(500);
                 } else {
-                    spindexMotor.setPower(motorPower);
+                    spindexShootingReset();
+                    spindexMotor.setPower(1);
+                    spindexMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 }
             }
-
-            if (full[0] && TCS1.isPressed()) {
-                spindexMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            if (gamepad1.x){
                 spindexMotor.setPower(0);
-                telemetry.addData("Pocket 1 is", "Full and under SHOOTER");
-            }
-
-            if (full[1] && TCS2.isPressed()) {
                 spindexMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                spindexMotor.setPower(0);
-                telemetry.addData("Pocket 2 is", "Full and under SHOOTER");
+                spindexIntakingReset_Movement();
             }
-
-            if (full[2] && TCS3.isPressed()) {
-                spindexMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                spindexMotor.setPower(0);
-                telemetry.addData("Pocket 3 is", "Full and under SHOOTER");
-            }
-
+            //This if loop is only a placeholder for now to switch to intake mode, when programms
+            // are merged, spindex would switch automatically to intake mode after a ball is shot
             for (int j = 0; j < detectedMotif.length; j++) {
                 if ((detectedMotif[j] == greenStr) || (detectedMotif[j] == purpleStr)) {
                     ball = j;
@@ -144,16 +139,27 @@ public class spindexMotorNormalization extends LinearOpMode {
             x = pressedIndex - ball;
             y = pressedIndex - noBall;
 
-            if (x>y) {
-               motorPower = -0.16;
+            if (x>y) { //Counter-Clockwise/left
+                z = (y * pocketRotation);
+                spindexMotor.setTargetPosition(z);
             }
-            if (x<y) {
-                motorPower = 0.16;
+            if (y>x) { //Clocwise/Right
+                z = (x * pocketRotation);
+                spindexMotor.setTargetPosition(z);
             }
-            if (x==y){
-                motorPower = -0.16;
+            if (x==y){ //Counter-Clockwise/left
+                z = (y * pocketRotation);
+                spindexMotor.setTargetPosition(z);
             }
-
+//X>Y then spindex moves Y # of pockets in the direction of what the sign is of the y, so if -1 then CC, if 1 then C
+//X<Y then spindex moves X# of pockets and then the same as above
+/*
+If (x>y){
+    z=(y*pocketRotation) ->pocketRotation==538 which is # of ticks per pocketRotation
+   z is how many ticks to move
+}
+Ex: y=-1 -> move -538 ticks
+ */
             telemetry.addData("purple[0]", purple[0]);
             telemetry.addData("purple[1]", purple[1]);
             telemetry.addData("purple[2]", purple[2]);
@@ -162,9 +168,7 @@ public class spindexMotorNormalization extends LinearOpMode {
             telemetry.addData("green[2]", green[2]);
             telemetry.addData("X", x);
             telemetry.addData("Y", y);
-            telemetry.addData("TCS1", TCS1.isPressed());
-            telemetry.addData("TCS2", TCS2.isPressed());
-            telemetry.addData("TCS3", TCS3.isPressed());
+            telemetry.addData("ShootingTCS", ShootingTCS.isPressed());
             telemetry.addData("DistanceCS1", d1);
             telemetry.addData("DistanceCS2", d2);
             telemetry.addData("DistanceCS3", d3);
@@ -172,6 +176,7 @@ public class spindexMotorNormalization extends LinearOpMode {
 
             telemetry.update();
         }
+
     }
         public String colorDetector (RevColorSensorV3 cs){
             int blue = cs.blue();
@@ -191,9 +196,39 @@ public class spindexMotorNormalization extends LinearOpMode {
             }
             return "";
         }
+
+    public void spindexShootingReset() {
+        while (!ShootingTCS.isPressed()) {
+            spindexMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            spindexMotor.setPower(1);
+        }
+        spindexMotor.setPower(0);
+        spindexMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        spindexMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+    public void spindexIntakingReset_Movement() {
+        //bassically this would reset to intaking mode so it would move in intaking thirds
+        //then it will move 1/3 then stop for 1 it second to let ball in then move, it will keep
+        // going on and on and on
+        while (!IntakingTCS.isPressed()) {
+            spindexMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            spindexMotor.setPower(1);
+        }
+        spindexMotor.setPower(0);
+        spindexMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        spindexMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        int l=1;
+        while (!gamepad1.circle || !gamepad1.triangle || !gamepad1.square) {
+            while (l>0) {
+                spindexMotor.setTargetPosition(intakingRotation * l);
+                spindexMotor.setPower(1);
+                spindexMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                sleep(100);
+            }
+        }
     }
 
-
+}
 
 
 // Square = Shoot purple
