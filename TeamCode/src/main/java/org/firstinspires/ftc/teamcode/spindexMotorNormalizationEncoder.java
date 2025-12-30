@@ -29,7 +29,6 @@ public class spindexMotorNormalizationEncoder extends LinearOpMode {
     private boolean[] green = new boolean[3];
     private boolean[] purple = new boolean[3];
     private String[] detectedMotif = new String[3];//color detection usage
-    private boolean[] tcs = new boolean[3];//normalization usage
     private double d1;
     private double d2;
     private double d3;
@@ -37,8 +36,9 @@ public class spindexMotorNormalizationEncoder extends LinearOpMode {
     int y = 0;
     int ball;
     int noBall;
-    int pressedIndex;
+    int currentIndex;
     int z;
+    int fullRotation =538;
     int pocketRotation = 179;
     int intakingRotation = 179;
 
@@ -131,19 +131,27 @@ public class spindexMotorNormalizationEncoder extends LinearOpMode {
                     noBall = j;
                 }
             }
-            for (int k = 0; k < tcs.length; k++) {
-                if (tcs[k]) {
-                    pressedIndex = k;
-                }
+
+
+            int a = Math.abs(spindexMotor.getCurrentPosition());
+            int relativePositionInRotation = a % fullRotation;
+
+            if (relativePositionInRotation < pocketRotation) {
+                currentIndex = 1;
+            } else if (relativePositionInRotation < pocketRotation * 2) {
+                currentIndex = 2;
+            } else {
+                currentIndex = 3;
             }
-            x = pressedIndex - ball;
-            y = pressedIndex - noBall;
+
+            x = currentIndex - ball;
+            y = currentIndex - noBall;
 
             if (x>y) { //Counter-Clockwise/left
                 z = (y * pocketRotation);
                 spindexMotor.setTargetPosition(z);
             }
-            if (y>x) { //Clocwise/Right
+            if (y>x) { //Clocwpresise/Right
                 z = (x * pocketRotation);
                 spindexMotor.setTargetPosition(z);
             }
@@ -223,7 +231,7 @@ Ex: y=-1 -> move -538 ticks
                 spindexMotor.setTargetPosition(intakingRotation * l);
                 spindexMotor.setPower(1);
                 spindexMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                sleep(100);
+                sleep(3000);
             }
         }
     }
